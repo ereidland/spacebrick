@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 using System;
 
-namespace Spacetile
+namespace Spacebrick
 {
     public struct BitRect : IComparable<BitRect>
     {

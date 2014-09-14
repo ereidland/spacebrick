@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 using System;
 
-namespace Spacetile
+namespace Spacebrick
 {
     public class KeyValueTree<K, V> where K : IComparable
     {
