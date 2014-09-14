@@ -29,6 +29,8 @@ namespace Spacebrick
 {
     public struct BitRect : IComparable<BitRect>
     {
+        public const int MaxValue = 16;
+
         public static byte GetFirstFour(byte b) { return (byte)(b >> 4); }
         public static byte GetSecondFour(byte b) { return (byte)(b & 0xF); }
 
@@ -41,10 +43,12 @@ namespace Spacebrick
         public static byte SetSecondFour(byte b, byte value)
         {
             //Mask with 11110000 then OR value masked with 00001111
-            return (b & 0xF0) | (value & 0xF);
+            return (byte)((b & 0xF0) | (value & 0xF));
         }
 
         private byte _a, _b, _c;
+
+        public int PositionIndex { get { return Z * MaxValue * MaxValue + Y * MaxValue + X; } }
 
         public byte X
         {
@@ -95,6 +99,8 @@ namespace Spacebrick
             int selfAX, selfAY, selfAZ, selfBX, selfBY, selfBZ;
             int otherAX, otherAY, otherAZ, otherBX, otherBY, otherBZ;
 
+            //Read all parameters and get A to B rects in stead of Position + Size rects.
+
             selfAX = X;
             selfAY = Y;
             selfAZ = Z;
@@ -138,7 +144,9 @@ namespace Spacebrick
 
         public BitRect(BitRect other)
         {
-            this(other._a, other._b, other._c);
+            _a = other._a;
+            _b = other._b;
+            _c = other._c;
         }
 
         public BitRect(byte x, byte y, byte z, byte width, byte height, byte depth)
@@ -154,7 +162,14 @@ namespace Spacebrick
 
         public BitRect(int x, int y, int z, int width, int height, int depth)
         {
-            this((byte)x, (byte)y, (byte)z, (byte)width, (byte)height, (byte)depth);
+            _a = _b = _c = 0;
+
+            X = (byte)x;
+            Y = (byte)y;
+            Z = (byte)z;
+            Width = (byte)width;
+            Height = (byte)height;
+            Depth = (byte)depth;
         }
     }
 }

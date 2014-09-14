@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
 
 namespace Spacebrick
 {
@@ -44,6 +45,18 @@ namespace Spacebrick
             {
                 Key = key;
                 Value = value;
+            }
+        }
+
+        private struct FromTo
+        {
+            public int From;
+            public int To;
+
+            public FromTo(int fromIndex, int toIndex)
+            {
+                From = fromIndex;
+                To = toIndex;
             }
         }
 
@@ -164,21 +177,29 @@ namespace Spacebrick
             _heap[source].Clear();
         }
 
-        private void MoveTree(int source, int dest)
+        private void MoveTree(int initialSource, int initialDest)
         {
-            MoveItem(source, dest);
+            Queue<FromTo> openQueue = new Queue<FromTo>();
 
-            int sourceLeft = GetLeft(source);
-            int sourceRight = GetRight(source);
+            openQueue.Enqueue(new FromTo(initialSource, initialDest));
 
-            int destLeft = GetLeft(dest);
-            int destRight = GetRight(dest);
+            while(openQueue.Count > 0)
+            {
+                var fromTo = openQueue.Dequeue();
+                MoveItem(fromTo.From, fromTo.To);
 
-            if (LeafExists(sourceLeft))
-                MoveTree(sourceLeft, destLeft);
+                int sourceLeft = GetLeft(fromTo.From);
+                int sourceRight = GetRight(fromTo.From);
 
-            if (LeafExists(sourceRight))
-                MoveTree(sourceRight, destRight);
+                int destLeft = GetLeft(fromTo.To);
+                int destRight = GetRight(fromTo.To);
+
+                if (LeafExists(sourceLeft))
+                    openQueue.Enqueue(new FromTo(sourceLeft, destLeft));
+
+                if (LeafExists(sourceRight))
+                    openQueue.Enqueue(new FromTo(sourceRight, destRight));
+            }
         }
 
         public void Delete(K key)
