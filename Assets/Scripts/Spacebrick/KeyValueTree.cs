@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace Spacebrick
 {
-    public class KeyValueTree<K, V> where K : IComparable
+    public class KeyValueTree<K, V> where K : IComparable<K>
     {
         public struct Leaf
         {
@@ -64,7 +64,40 @@ namespace Spacebrick
 
         public System.Collections.Generic.IEnumerable<Leaf> RawLeaves { get { return _heap; } }
 
-        public bool GetExistingLeaf(K key, out V value)
+        public bool TryGetLeaf(K key, out Leaf leaf)
+        {
+            if (_heap != null)
+            {
+                int curIndex = 1;
+                while (curIndex < _heap.Length)
+                {
+                    Leaf currentLeaf = _heap[curIndex];
+                    int compare = key.CompareTo(currentLeaf.Key);
+
+                    if (compare > 0)
+                    {
+                        //If we are larger, then look left.
+                        curIndex *= 2;
+                    }
+                    else if (compare < 0)
+                    {
+                        //If we are smaller, then look right.
+                        curIndex = curIndex*2 + 1;
+                    }
+                    else
+                    {
+                        //If we are equal, then we found it.
+                        leaf = currentLeaf;
+                        return true;
+                    }
+                }
+            }
+
+            leaf = new Leaf();
+            return false;
+        }
+
+        public bool TryGet(K key, out V value)
         {
             if (_heap != null)
             {

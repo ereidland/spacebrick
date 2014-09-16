@@ -8,10 +8,14 @@ public class TreeTest : MonoBehaviour
 
     public int MinRange = 1;
     public int MaxRange = 1000;
+
     private void Start()
     {
         KeyValueTree<int, string> tree = new KeyValueTree<int, string>();
 
+        var watch = new System.Diagnostics.Stopwatch();
+
+        watch.Start();
         for (int i = 0; i < NumIterations; i++)
         {
             int key = Random.Range(MinRange, MaxRange);
@@ -28,10 +32,14 @@ public class TreeTest : MonoBehaviour
             }
         }
 
+        watch.Stop();
+
         foreach (var leaf in tree.RawLeaves)
         {
             if (leaf.Key != 0)
                 Debug.Log(leaf.Key + " - " + leaf.Value);
         }
+
+        Debug.Log(string.Format("{0} iterations took {1} milliseconds, at {2} iterations/millisecond.", NumIterations, watch.ElapsedMilliseconds, NumIterations/(float)watch.ElapsedMilliseconds));
     }
 }
