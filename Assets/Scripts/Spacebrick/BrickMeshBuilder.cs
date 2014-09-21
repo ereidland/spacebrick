@@ -1,5 +1,5 @@
 ﻿//
-// Vector3i.cs
+// BrickMeshBuilder.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -24,49 +24,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spacebrick
 {
-    public struct Vector3i : IComparable<Vector3i>
+    public interface IBrickMeshBuilder
     {
-        public int x, y, z;
+        int TotalVertices { get; }
+        int TotalIndices { get; }
+        Material RenderMaterial { get; }
 
-        /// <summary>
-        /// Unreliable, but it gets rid of the not implemented warning.
-        /// </summary>
-        public override int GetHashCode() { return x ^ y ^ z; }
-
-        public int CompareTo(Vector3i other)
-        {
-            return Math.Sign(x.CompareTo(other.x) + y.CompareTo(other.y)*2 + z.CompareTo(other.z)*4);
-        }
-
-        public bool Equals(Vector3i other)
-        {
-            return x == other.x && y == other.y && z == other.z;
-        }
-
-        public override bool Equals (object obj)
-        {
-            if (obj is Vector3i)
-                return Equals((Vector3i)obj);
-
-            return false;
-        }
-
-        public Vector3i(int x = 0, int y = 0, int z = 0)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public Vector3i(Vector3i other)
-        {
-            x = other.x;
-            y = other.y;
-            z = other.z;
-        }
+        void Build(MeshBuilder builder, Brick brick);
     }
 }
 

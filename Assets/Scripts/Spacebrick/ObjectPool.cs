@@ -35,6 +35,15 @@ namespace Spacebrick
 
         private Queue<T> _pool = new Queue<T>();
 
+        public IEnumerable<T> FlushPool
+        {
+            get
+            {
+                while (_pool.Count > 0)
+                    yield return _pool.Dequeue();
+            }
+        }
+
         public T Pop()
         {
             if (_pool.Count > 0)
@@ -49,6 +58,9 @@ namespace Spacebrick
             _pool.Enqueue(item);
         }
 
+        private T DefaultCreate() { return Activator.CreateInstance<T>(); }
+        private void DefaultDispose(T item) {}
+
         public ObjectPool(Func<T> createFunction, Action<T> disposeFunction)
         {
             _create = createFunction;
@@ -58,7 +70,8 @@ namespace Spacebrick
         public ObjectPool()
         {
             //Default initialization.
-            this(() => { return Activator.CreateInstance<T>(); }, (item) => {});
+            _create = DefaultCreate;
+            _dispose = DefaultDispose;
         }
     }
 }

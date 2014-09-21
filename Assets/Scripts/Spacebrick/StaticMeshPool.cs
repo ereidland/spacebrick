@@ -1,5 +1,5 @@
 ﻿//
-// Vector3i.cs
+// MeshPool.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -24,48 +24,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using UnityEngine;
 
 namespace Spacebrick
 {
-    public struct Vector3i : IComparable<Vector3i>
+    public class StaticMeshPool : MonoBehaviour
     {
-        public int x, y, z;
+        private static StaticMeshPool _instance;
 
-        /// <summary>
-        /// Unreliable, but it gets rid of the not implemented warning.
-        /// </summary>
-        public override int GetHashCode() { return x ^ y ^ z; }
-
-        public int CompareTo(Vector3i other)
+        private static void EnsureInstance()
         {
-            return Math.Sign(x.CompareTo(other.x) + y.CompareTo(other.y)*2 + z.CompareTo(other.z)*4);
+            if (_instance == null)
+                _instance = new GameObject("_StaticMeshPool").AddComponent<StaticMeshPool>();
         }
 
-        public bool Equals(Vector3i other)
+        private ObjectPool<Mesh> _pool = new ObjectPool<Mesh>();
+
+        public static Mesh GetMesh()
         {
-            return x == other.x && y == other.y && z == other.z;
+            EnsureInstance();
+            return _instance._pool.Pop();
         }
 
-        public override bool Equals (object obj)
+        public static void ReleaseMesh(Mesh mesh)
         {
-            if (obj is Vector3i)
-                return Equals((Vector3i)obj);
-
-            return false;
+            EnsureInstance();
+            _instance._pool.Push(mesh);
         }
 
-        public Vector3i(int x = 0, int y = 0, int z = 0)
+        private void OnDestroy()
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public Vector3i(Vector3i other)
-        {
-            x = other.x;
-            y = other.y;
-            z = other.z;
+            foreach (var mesh in _pool.FlushPool)
+            {
+                if (mesh != null)
+                    Destroy(mesh);
+            }
         }
     }
 }

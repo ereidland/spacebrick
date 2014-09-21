@@ -26,19 +26,25 @@
 using UnityEngine;
 using System.Collections;
 
-public class BrickPrefabConfig : MonoBehaviour
+namespace Spacebrick
 {
-    [SerializeField]
-    private Mesh _mesh;
-
-    [SerializeField]
-    private Material _material;
-
-    [SerializeField]
-    private string _name;
-
-    public void Register()
+    public class BrickPrefabConfig : MonoBehaviour
     {
+        [SerializeField]
+        private Mesh _mesh;
 
+        [SerializeField]
+        private Material _material;
+
+        [SerializeField]
+        private string _name;
+
+        public void Register()
+        {
+            var typeInfo = BrickTypeInfo.GetTypeInfo(name);
+            if (typeInfo == null)
+                typeInfo = new BrickTypeInfo(_name);
+            BrickVisualInfo.RegisterBuilder(typeInfo, new BrickUnityMeshBuilder(_mesh, _material));
+        }
     }
 }

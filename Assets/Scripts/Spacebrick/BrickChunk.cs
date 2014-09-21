@@ -51,7 +51,7 @@ namespace Spacebrick
 
         private KeyValueTree<BitRect, BrickInfo> _bricks = new KeyValueTree<BitRect, BrickInfo>();
 
-        public IEnumerator<Brick> Bricks
+        public IEnumerable<Brick> Bricks
         {
             get
             {
@@ -59,6 +59,8 @@ namespace Spacebrick
                     yield return new Brick(leaf.Key, leaf.Value);
             }
         }
+
+        public int BrickCount { get{ return _bricks.Count; } }
 
         public Vector3i ChunkPosition { get; private set; }
         public Vector3i WorldPosition { get { return GetWorldPosition(ChunkPosition); } }

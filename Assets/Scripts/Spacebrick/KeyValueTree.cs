@@ -61,6 +61,7 @@ namespace Spacebrick
         }
 
         private Leaf[] _heap;
+        public int Count { get; private set; }
 
         public System.Collections.Generic.IEnumerable<Leaf> RawLeaves { get { return _heap; } }
 
@@ -191,6 +192,8 @@ namespace Spacebrick
             int curIndex = FindIndex(key, true);
 
             _heap[curIndex] = new Leaf(key, value);
+
+            Count = Math.Max(curIndex, Count); //Not doing -1 because indexes for the heap are 1 based.
         }
 
         private bool LeafExists(int index)
@@ -232,6 +235,16 @@ namespace Spacebrick
 
                 if (LeafExists(sourceRight))
                     openQueue.Enqueue(new FromTo(sourceRight, destRight));
+            }
+        }
+
+        private void CalculateCount()
+        {
+            var defaultKey = default(K);
+            for (int i = _heap.Length - 1; i >= 1; i--)
+            {
+                if (!_heap[i].Key.Equals(defaultKey))
+                    Count = i; //Not doing i - 1 because indexes on the heap are 1 based.
             }
         }
 
@@ -286,6 +299,8 @@ namespace Spacebrick
                         }
                     }
                 }
+
+                CalculateCount();
             }
         }
 

@@ -76,18 +76,19 @@ namespace Spacebrick
 
     public class BrickTypeInfo
     {
-        private static Dictionary<string, BrickTypeInfo> _brickTypeInfoByName = new Dictionary<string, BrickTypeInfo>(StringComparer.InvariantCultureIgnoreCase);
-        private static Dictionary<short, BrickTypeInfo> _brickTypeInfoByID = new Dictionary<short, BrickTypeInfo>();
+        private static NameIDRegistry<BrickTypeInfo> _brickTypeRegistry = new NameIDRegistry<BrickTypeInfo>();
         private static NameIDManager _nameIDManager = new NameIDManager();
 
-        public static void Register(BrickTypeInfo info)
+        public static BrickTypeInfo GetTypeInfo(string name) { return _brickTypeRegistry.GetItem(name); }
+        public static BrickTypeInfo GetTypeInfo(int id) { return _brickTypeRegistry.GetItem(id); }
+
+        private static void Register(BrickTypeInfo info)
         {
-            _brickTypeInfoByName[info.Name] = info;
-            _brickTypeInfoByID[info.ID] = info;
+            _brickTypeRegistry.RegisterItem(info, info.Name, info.ID);
         }
 
-        public short ID { get; private set; }
         public string Name { get; private set; }
+        public short ID { get; private set; }
 
         //TODO: Initialization from JSON, where ID is managed through a separate list.
 
@@ -96,6 +97,8 @@ namespace Spacebrick
             Name = name;
             if (!string.IsNullOrEmpty(name))
                 ID = _nameIDManager.RegisterName(name);
+
+            Register(this);
         }
     }
 }

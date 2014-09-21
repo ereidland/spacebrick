@@ -1,5 +1,5 @@
 ﻿//
-// Vector3i.cs
+// NameIDRegistry.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -24,48 +24,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
 
 namespace Spacebrick
 {
-    public struct Vector3i : IComparable<Vector3i>
+    public class NameIDRegistry<T>
     {
-        public int x, y, z;
+        private Dictionary<string, T> _itemsByName = new Dictionary<string, T>(StringComparer.InvariantCultureIgnoreCase);
+        private Dictionary<int, T> _itemsByID = new Dictionary<int, T>();
 
-        /// <summary>
-        /// Unreliable, but it gets rid of the not implemented warning.
-        /// </summary>
-        public override int GetHashCode() { return x ^ y ^ z; }
-
-        public int CompareTo(Vector3i other)
+        public void RegisterItem(T item, string name, int id)
         {
-            return Math.Sign(x.CompareTo(other.x) + y.CompareTo(other.y)*2 + z.CompareTo(other.z)*4);
+            _itemsByID[id] = item;
+            _itemsByName[name] = item;
         }
 
-        public bool Equals(Vector3i other)
+        public T GetItem(string name)
         {
-            return x == other.x && y == other.y && z == other.z;
+            T item;
+            _itemsByName.TryGetValue(name, out item);
+            return item;
         }
 
-        public override bool Equals (object obj)
+        public T GetItem(int id)
         {
-            if (obj is Vector3i)
-                return Equals((Vector3i)obj);
-
-            return false;
-        }
-
-        public Vector3i(int x = 0, int y = 0, int z = 0)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public Vector3i(Vector3i other)
-        {
-            x = other.x;
-            y = other.y;
-            z = other.z;
+            T item;
+            _itemsByID.TryGetValue(id, out item);
+            return item;
         }
     }
 }
