@@ -30,21 +30,41 @@ namespace Spacebrick
 {
     public class BrickPrefabConfig : MonoBehaviour
     {
+        public enum MeshSettings
+        {
+            LeaveItAlone,
+            OverrideColor,
+        }
+
+        [SerializeField]
+        private string _name;
+
         [SerializeField]
         private Mesh _mesh;
+
+        [SerializeField]
+        private MeshSettings _meshSettings = MeshSettings.LeaveItAlone;
 
         [SerializeField]
         private Material _material;
 
         [SerializeField]
-        private string _name;
+        private Color _color = Color.white;
+
+        public BrickTypeInfo TypeInfo { get; private set; }
 
         public void Register()
         {
-            var typeInfo = BrickTypeInfo.GetTypeInfo(name);
-            if (typeInfo == null)
-                typeInfo = new BrickTypeInfo(_name);
-            BrickVisualInfo.RegisterBuilder(typeInfo, new BrickUnityMeshBuilder(_mesh, _material));
+            TypeInfo = BrickTypeInfo.GetTypeInfo(name);
+            if (TypeInfo == null)
+                TypeInfo = new BrickTypeInfo(_name);
+
+            var builder = new BrickUnityMeshBuilder(_mesh, _material);
+
+            if (_meshSettings == MeshSettings.OverrideColor)
+                builder.OverrideColor(_color);
+
+            BrickVisualInfo.RegisterBuilder(TypeInfo, builder);
         }
     }
 }

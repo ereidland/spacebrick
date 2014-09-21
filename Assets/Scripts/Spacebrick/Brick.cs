@@ -27,7 +27,7 @@ using System;
 
 namespace Spacebrick
 {
-    public enum BlockDireciton : byte
+    public enum BrickDirection : byte
     {
         Forward = 0,
         Right = 1,
@@ -39,26 +39,30 @@ namespace Spacebrick
 
     public struct BrickInfo
     {
-        public const int DataMask = 0x3FF; //0000 0011 1111 1111
+        public const ushort IDMask = 0x3FF; //0000 0011 1111 1111
 
-        public const int DirectionMask = 0x1C00; //0001 1100 0000 0000
-        public const int DirectionShift = 10;
+        public const ushort DirectionMask = 0x1C00; //0001 1100 0000 0000
+        public const ushort DirectionShift = 10;
 
-        public const int MetaMask = 0xFC00; //1111 1100 0000 0000
-        public const int MetaShift = 10;
+        public const ushort MetaMask = 0xFC00; //1111 1100 0000 0000
+        public const ushort MetaShift = 10;
 
         //Might cram in meta value into _data later.
-        private short _data;
+        private ushort _data;
 
-        public short ID { get { return (short)(_data & DataMask); } }
+        public ushort ID
+        {
+            get { return (ushort)(_data & IDMask); }
+            set { _data = (ushort)((_data & MetaMask) | (value & IDMask)); }
+        }
 
         /// <summary>
         /// Uses last 3 bits, but not first 3 bits, to store direction.
         /// </summary>
-        public BlockDireciton Direction
+        public BrickDirection Direction
         {
-            get { return (BlockDireciton)((_data & DirectionMask) >> DirectionShift); }
-            set { _data = (short)((_data & ~DirectionMask) | ((byte)value << DirectionShift)); }
+            get { return (BrickDirection)((_data & DirectionMask) >> DirectionShift); }
+            set { _data = (ushort)((_data & ~DirectionMask) | ((byte)value << DirectionShift)); }
         }
 
         /// <summary>
@@ -67,12 +71,20 @@ namespace Spacebrick
         public byte Meta
         {
             get { return (byte)((_data & MetaMask) >> MetaShift); }
-            set { _data = (short)(ID | (value << MetaShift)); }
+            set { _data = (ushort)(ID | (value << MetaShift)); }
         }
 
-        public BrickInfo(short data)
+        public BrickInfo(ushort id, BrickDirection direction = BrickDirection.Forward)
         {
-            _data = data;
+            _data = 0;
+
+            ID = id;
+            Direction = direction;
+        }
+
+        public BrickInfo(BrickInfo other)
+        {
+            _data = other._data;
         }
     }
 
@@ -80,6 +92,8 @@ namespace Spacebrick
     {
         public BitRect Rect;
         public BrickInfo Info;
+
+        public bool IsEmpty { get { return Info.ID == 0; } }
 
         public Brick(BitRect rect, BrickInfo info)
         {

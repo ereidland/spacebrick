@@ -51,6 +51,24 @@ namespace Spacebrick
 
         private KeyValueTree<BitRect, BrickInfo> _bricks = new KeyValueTree<BitRect, BrickInfo>();
 
+        private bool Contains(int x, int y, int z)
+        {
+            return x >= 0 && y >= 0 && z >= 0 && x < ChunkSize && y < ChunkSize && z < ChunkSize;
+        }
+
+        public Brick GetBrick(int x, int y, int z)
+        {
+            if (Contains(x, y, z))
+            {
+                KeyValueTree<BitRect, BrickInfo>.Leaf brickLeaf;
+                _bricks.TryGetLeaf(new BitRect(x, y, z, 1, 1, 1), out brickLeaf);
+                return new Brick(brickLeaf.Key, brickLeaf.Value);
+            }
+            return new Brick();
+        }
+
+        public void SetBrick(Brick brick) { _bricks.Set(brick.Rect, brick.Info); }
+
         public IEnumerable<Brick> Bricks
         {
             get

@@ -63,7 +63,22 @@ namespace Spacebrick
         private Leaf[] _heap;
         public int Count { get; private set; }
 
-        public System.Collections.Generic.IEnumerable<Leaf> RawLeaves { get { return _heap; } }
+        public System.Collections.Generic.IEnumerable<Leaf> RawLeaves
+        {
+            get
+            {
+                if (_heap != null)
+                {
+                    var defaultKey = default(K);
+                    for (int i = 0; i < _heap.Length; i++)
+                    {
+                        if (!defaultKey.Equals(_heap[i].Key))
+                            yield return _heap[i];
+                    }
+                }
+                yield break;
+            }
+        }
 
         public bool TryGetLeaf(K key, out Leaf leaf)
         {

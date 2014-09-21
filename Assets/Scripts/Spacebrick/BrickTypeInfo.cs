@@ -32,12 +32,12 @@ namespace Spacebrick
     {
         public const short MaximumID = 0x3FF; //1023
 
-        private Dictionary<string, short> _idsByName = new Dictionary<string, short>(StringComparer.InvariantCultureIgnoreCase);
-        private Dictionary<short, string> _namesByID = new Dictionary<short, string>();
+        private Dictionary<string, ushort> _idsByName = new Dictionary<string, ushort>(StringComparer.InvariantCultureIgnoreCase);
+        private Dictionary<ushort, string> _namesByID = new Dictionary<ushort, string>();
 
-        private short CreateID(string name)
+        private ushort CreateID(string name)
         {
-            short id;
+            ushort id;
             string otherName;
             if (!_idsByName.TryGetValue(name, out id))
             {
@@ -57,16 +57,16 @@ namespace Spacebrick
             return id;
         }
 
-        public short RegisterName(string name) { return CreateID(name); }
+        public ushort RegisterName(string name) { return CreateID(name); }
 
-        public short GetID(string name)
+        public ushort GetID(string name)
         {
-            short id;
+            ushort id;
             _idsByName.TryGetValue(name, out id);
             return id;
         }
 
-        public string GetName(short id)
+        public string GetName(ushort id)
         {
             string name;
             _namesByID.TryGetValue(id, out name);
@@ -88,7 +88,7 @@ namespace Spacebrick
         }
 
         public string Name { get; private set; }
-        public short ID { get; private set; }
+        public ushort ID { get; private set; }
 
         //TODO: Initialization from JSON, where ID is managed through a separate list.
 

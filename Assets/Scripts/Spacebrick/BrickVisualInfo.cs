@@ -30,6 +30,35 @@ using UnityEngine;
 
 namespace Spacebrick
 {
+    public static class BrickVisualHelpers
+    {
+        private static Quaternion Forward = Quaternion.identity;
+        private static Quaternion Right = Quaternion.AngleAxis(90, Vector3.up);
+        private static Quaternion Back = Quaternion.AngleAxis(180, Vector3.up);
+        private static Quaternion Left = Quaternion.AngleAxis(-90, Vector3.up);
+        private static Quaternion Down = Quaternion.AngleAxis(90, Vector3.right);
+        private static Quaternion Up = Quaternion.AngleAxis(-90, Vector3.right);
+
+        public static Quaternion ToRotation(this BrickDirection direciton)
+        {
+            switch (direciton)
+            {
+                case BrickDirection.Right:
+                    return Right;
+                case BrickDirection.Back:
+                    return Back;
+                case BrickDirection.Left:
+                    return Left;
+                case BrickDirection.Down:
+                    return Down;
+                case BrickDirection.Up:
+                    return Up;
+                case BrickDirection.Forward:
+                default:
+                    return Forward;
+            }
+        }
+    }
     public class BrickVisualInfo
     {
         private static NameIDRegistry<BrickVisualInfo> _brickVisualRegistry = new NameIDRegistry<BrickVisualInfo>();
@@ -38,7 +67,7 @@ namespace Spacebrick
         public IBrickMeshBuilder Builder { get; private set; }
 
         public static BrickVisualInfo GetVisualInfo(string name) { return _brickVisualRegistry.GetItem(name); }
-        public static BrickVisualInfo GetVisualInfo(short id) { return _brickVisualRegistry.GetItem(id); }
+        public static BrickVisualInfo GetVisualInfo(int id) { return _brickVisualRegistry.GetItem(id); }
 
         public static bool RegisterBuilder(string name, IBrickMeshBuilder builder) { return RegisterBuilder(BrickTypeInfo.GetTypeInfo(name), builder); }
         public static bool RegisterBuilder(int id, IBrickMeshBuilder builder) { return RegisterBuilder(BrickTypeInfo.GetTypeInfo(id), builder); }
