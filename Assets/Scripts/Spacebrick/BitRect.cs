@@ -109,19 +109,22 @@ namespace Spacebrick
             selfBY = selfAY + Height;
             selfBZ = selfAZ + Depth;
 
-
             otherAX = other.X;
             otherAY = other.Y;
             otherAZ = other.Z;
 
-            otherBX = otherAX + other.X;
-            otherBY = otherAY + other.Y;
-            otherBZ = otherAZ + other.Z;
+            otherBX = otherAX + other.Width;
+            otherBY = otherAY + other.Height;
+            otherBZ = otherAZ + other.Depth;
 
-            return Math.Abs(selfAX + selfBX - otherAX - otherBX) < (selfBX - selfAX + otherBX - otherAX)
-                && Math.Abs(selfAY + selfBY - otherAY - otherBY) < (selfBY - selfAY + otherBY - otherAY)
-                && Math.Abs(selfAZ + selfBZ - otherAZ - otherBZ) < (selfBZ - selfAZ + otherBZ - otherAZ);
+            return Math.Abs(selfAX + selfBX - otherAX - otherBX) <= (selfBX - selfAX + otherBX - otherAX)
+                && Math.Abs(selfAY + selfBY - otherAY - otherBY) <= (selfBY - selfAY + otherBY - otherAY)
+                && Math.Abs(selfAZ + selfBZ - otherAZ - otherBZ) <= (selfBZ - selfAZ + otherBZ - otherAZ);
         }
+
+        //TODO: Rethink the way comparison works.
+        //It doesn't cover the case of intersecting blocks because not all potentially intersecting blocks are tested.
+        //Not immediately sure of a method that doesn't require testing every block that has an X, Y, or Z coordinate less than ours.
 
         //Used for mapping in a tree.
         public int CompareTo(BitRect other)
@@ -129,10 +132,7 @@ namespace Spacebrick
             if (Intersects(other))
                 return 0;
 
-            if (X < other.X || Y < other.Y || Z < other.Z)
-                return -1;
-
-            return 1;
+            return Math.Sign(X.CompareTo(other.X) + Y.CompareTo(other.Y)*2 + Z.CompareTo(other.Z)*4);
         }
 
         public BitRect(byte a, byte b, byte c)

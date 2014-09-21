@@ -53,12 +53,12 @@ namespace Spacebrick
 
             var chunk = new BrickChunk(new Vector3i());
             var directions = System.Enum.GetValues(typeof(BrickDirection));
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
                 var type = knownTypes[Random.Range(0, knownTypes.Count)];
-                int width = Random.Range(1, 4);
-                int height = Random.Range(1, 4);
-                int depth = Random.Range(1, 4);
+                int width = Random.Range(1, 8);
+                int height = Random.Range(1, 8);
+                int depth = Random.Range(1, 8);
                 int x = Random.Range(0, BrickChunk.ChunkSize);
                 int y = Random.Range(0, BrickChunk.ChunkSize);
                 int z = Random.Range(0, BrickChunk.ChunkSize);
