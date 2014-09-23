@@ -1,5 +1,5 @@
 ﻿//
-// VoxelBrickChunk.cs
+// BrickChunk.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -28,45 +28,11 @@ using System.Collections.Generic;
 
 namespace Spacebrick
 {
-    public enum VoxelIndexMeta : byte
-    {
-        Empty = 0,
-        Here = 1,
-        Left = 2,
-        Back = 3,
-        Down = 4,
-        LeftDownBack = 5
-    }
-    public struct VoxelIndex
-    {
-        public const int MetaMask = 0xF000; // 1111 0000 0000 0000
-        public const int MetaShift = 12;
-
-        public const int IndexMask = 0xFFF; // 0000 1111 1111 1111
-
-        public ushort RawData;
-        public ushort Index
-        {
-            get { return (ushort)(Index & IndexMask); }
-            set { RawData = (ushort)((Index & MetaMask) | (value & IndexMask)); }
-        }
-
-        public byte Meta
-        {
-            get { return (byte)(RawData >> MetaShift); }
-            set { RawData = (ushort)((value << MetaShift) | Index); }
-        }
-
-        public VoxelIndexMeta IndexMeta { get { return (VoxelIndexMeta)Meta; } }
-    }
-
-    public class BrickChunk
+    public class TreeBasedBrickChunk
     {
         public const int ChunkSize = 16;
         public const int ChunkSizeMask = 15;
         public const int ChunkSizeShift = 4;
-        public const int ChunkArrayLength = ChunkSize*ChunkSize*ChunkSize;
-
 
         public static Vector3i GetWorldPosition(Vector3i chunkPosition)
         {
@@ -78,58 +44,60 @@ namespace Spacebrick
             return new Vector3i(worldPosition.x >> ChunkSizeShift, worldPosition.y >> ChunkSizeShift, worldPosition.z >> ChunkSizeShift);
         }
 
-        public static void GetChunkLocalPosition(ref int x, ref int y, ref int z)
-        {
-            x &= ChunkSizeMask;
-            y &= ChunkSizeMask;
-            z &= ChunkSizeMask;
-        }
-
         public static Vector3i GetChunkLocalPosition(Vector3i worldPosition)
         {
             return new Vector3i(worldPosition.x & ChunkSizeMask, worldPosition.y & ChunkSizeMask, worldPosition.z & ChunkSizeMask);
         }
+
+        private KeyValueTree<BitRect, BrickInfo> _bricks = new KeyValueTree<BitRect, BrickInfo>();
 
         private bool Contains(int x, int y, int z)
         {
             return x >= 0 && y >= 0 && z >= 0 && x < ChunkSize && y < ChunkSize && z < ChunkSize;
         }
 
-
-        private VoxelIndex[] _indexes = new VoxelIndex[ChunkArrayLength];
-
-        //TODO: Trimming down of _bricks list before saving/loading.
-        private List<Brick> _bricks = new List<Brick>();
-
-        private int FindSlotForBrick()
+        public Brick GetBrick(int x, int y, int z)
         {
-            //Check for empty bricks in list.
-            for (int i = 0; i < _bricks.Count; i++)
+            if (Contains(x, y, z))
             {
-                if (_bricks[i].IsEmpty)
-                    return i;
+                KeyValueTree<BitRect, BrickInfo>.Leaf brickLeaf;
+                _bricks.TryGetLeaf(new BitRect(x, y, z, 1, 1, 1), out brickLeaf);
+                return new Brick(brickLeaf.Key, brickLeaf.Value);
             }
-
-            //No empty bricks? Add one to the end.
-            _bricks.Add(new Brick());
-            return _bricks.Count - 1;
-        }
-
-        public static int GetIndexFromPosition(int x, int y, int z) { return z*ChunkSize*ChunkSize + y*ChunkSize + x; }
-        public VoxelIndex GetVoxelIndex(int x, int y, int z) { return _indexes[GetIndexFromPosition(x, y, z)]; }
-
-        public Brick GetBrickAtIndex(int index)
-        {
-            if (index >= 0 && index < _bricks.Count)
-                return _bricks[index];
-
             return new Brick();
         }
 
-        public void SetBrickAtIndex(int index, Brick brick)
+        public void SetBrick(Brick brick) { _bricks.Set(brick.Rect, brick.Info); }
+
+        public IEnumerable<Brick> Bricks
         {
-            if (index >= 0 && index < _bricks.Count)
-                _bricks[index] = brick;
+            get
+            {
+                foreach (var leaf in _bricks.RawLeaves)
+                    yield return new Brick(leaf.Key, leaf.Value);
+            }
+        }
+
+        public int BrickCount { get{ return _bricks.Count; } }
+
+        public Vector3i ChunkPosition { get; private set; }
+        public Vector3i WorldPosition { get { return GetWorldPosition(ChunkPosition); } }
+
+        public bool TryGetBrick(BitRect rect, out Brick brick)
+        {
+            KeyValueTree<BitRect, BrickInfo>.Leaf leaf;
+            if (_bricks.TryGetLeaf(rect, out leaf))
+            {
+                brick = new Brick(leaf.Key, leaf.Value);
+                return true;
+            }
+            brick = new Brick();
+            return false;
+        }
+
+        public TreeBasedBrickChunk(Vector3i chunkPosition)
+        {
+            ChunkPosition = chunkPosition;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Spacebrick
                     Debug.Log("What is " + brickPrefab.name + " doing here without a BrickPrefabConfigComponent?");
             }
 
-            var chunk = new BrickChunk(new Vector3i());
+            var chunk = new TreeBasedBrickChunk(new Vector3i());
             var directions = System.Enum.GetValues(typeof(BrickDirection));
             for (int i = 0; i < 100; i++)
             {
@@ -59,9 +59,9 @@ namespace Spacebrick
                 int width = Random.Range(1, 8);
                 int height = Random.Range(1, 8);
                 int depth = Random.Range(1, 8);
-                int x = Random.Range(0, BrickChunk.ChunkSize);
-                int y = Random.Range(0, BrickChunk.ChunkSize);
-                int z = Random.Range(0, BrickChunk.ChunkSize);
+                int x = Random.Range(0, TreeBasedBrickChunk.ChunkSize);
+                int y = Random.Range(0, TreeBasedBrickChunk.ChunkSize);
+                int z = Random.Range(0, TreeBasedBrickChunk.ChunkSize);
 
                 BrickDirection rotation = (BrickDirection)directions.GetValue(Random.Range(0, directions.Length - 1));
 

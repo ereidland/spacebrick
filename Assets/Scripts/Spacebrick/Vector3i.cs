@@ -38,7 +38,15 @@ namespace Spacebrick
 
         public int CompareTo(Vector3i other)
         {
-            return Math.Sign(x.CompareTo(other.x) + y.CompareTo(other.y)*2 + z.CompareTo(other.z)*4);
+            int comparison = x.CompareTo(other.x);
+
+            if (comparison == 0)
+                comparison = y.CompareTo(other.y);
+
+            if (comparison == 0)
+                comparison = z.CompareTo(other.z);
+
+            return comparison;
         }
 
         public bool Equals(Vector3i other)
