@@ -1,5 +1,5 @@
 ﻿//
-// VoxelBrickChunk.cs
+// BrickChunk.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -28,45 +28,11 @@ using System.Collections.Generic;
 
 namespace Spacebrick
 {
-    public enum VoxelIndexMeta : byte
-    {
-        Empty = 0,
-        Here = 1,
-        Left = 2,
-        Back = 3,
-        Down = 4,
-        LeftDownBack = 5
-    }
-    public struct VoxelIndex
-    {
-        public const int MetaMask = 0xF000; // 1111 0000 0000 0000
-        public const int MetaShift = 12;
-
-        public const int IndexMask = 0xFFF; // 0000 1111 1111 1111
-
-        public ushort RawData;
-        public ushort Index
-        {
-            get { return (ushort)(Index & IndexMask); }
-            set { RawData = (ushort)((Index & MetaMask) | (value & IndexMask)); }
-        }
-
-        public byte Meta
-        {
-            get { return (byte)(RawData >> MetaShift); }
-            set { RawData = (ushort)((value << MetaShift) | Index); }
-        }
-
-        public VoxelIndexMeta IndexMeta { get { return (VoxelIndexMeta)Meta; } }
-    }
-
     public class BrickChunk
     {
         public const int ChunkSize = 16;
         public const int ChunkSizeMask = 15;
         public const int ChunkSizeShift = 4;
-        public const int ChunkArrayLength = ChunkSize*ChunkSize*ChunkSize;
-
 
         public static Vector3i GetWorldPosition(Vector3i chunkPosition)
         {
@@ -90,16 +56,58 @@ namespace Spacebrick
             return new Vector3i(worldPosition.x & ChunkSizeMask, worldPosition.y & ChunkSizeMask, worldPosition.z & ChunkSizeMask);
         }
 
-        private bool Contains(int x, int y, int z)
+        public Vector3i ChunkPosition { get; private set; }
+        public Vector3i WorldPosition { get { return GetWorldPosition(ChunkPosition); } }
+
+        private bool ContainsLocally(int x, int y, int z)
         {
             return x >= 0 && y >= 0 && z >= 0 && x < ChunkSize && y < ChunkSize && z < ChunkSize;
         }
 
-
-        private VoxelIndex[] _indexes = new VoxelIndex[ChunkArrayLength];
-
-        //TODO: Trimming down of _bricks list before saving/loading.
         private List<Brick> _bricks = new List<Brick>();
+
+        public IEnumerable<Brick> Bricks
+        {
+            get
+            {
+                for (int i = 0; i < _bricks.Count; i++)
+                    yield return _bricks[i];
+            }
+        }
+
+        public int BrickCount { get { return _bricks.Count; } }
+
+        public List<Brick> GetOverlappingBricks(BitRect rect)
+        {
+            List<Brick> overlappingBricks = new List<Brick>();
+            for(int i = 0; i < _bricks.Count; i++)
+            {
+                var brick = _bricks[i];
+                if (brick.Rect.Intersects(rect))
+                    overlappingBricks.Add(brick);
+            }
+
+            return overlappingBricks;
+        }
+
+        public bool HasAnyOverlappingBricks(int x, int y, int z, int width, int height, int depth)
+        {
+            for (int i = 0; i < _bricks.Count; i++)
+                if (_bricks[i].Rect.Intersects(x, y, z, width, height, depth))
+                    return true;
+
+            return false;
+        }
+
+        public bool HasAnyOverlappingBricks(BitRect rect)
+        {
+            List<Brick> overlappingBricks = new List<Brick>();
+            for(int i = 0; i < _bricks.Count; i++)
+                if (_bricks[i].Rect.Intersects(rect))
+                    return true;
+
+            return false;
+        }
 
         private int FindSlotForBrick()
         {
@@ -115,8 +123,10 @@ namespace Spacebrick
             return _bricks.Count - 1;
         }
 
-        public static int GetIndexFromPosition(int x, int y, int z) { return z*ChunkSize*ChunkSize + y*ChunkSize + x; }
-        public VoxelIndex GetVoxelIndex(int x, int y, int z) { return _indexes[GetIndexFromPosition(x, y, z)]; }
+        public void AddBrick(Brick brick)
+        {
+            _bricks.Add(brick);
+        }
 
         public Brick GetBrickAtIndex(int index)
         {
@@ -130,6 +140,11 @@ namespace Spacebrick
         {
             if (index >= 0 && index < _bricks.Count)
                 _bricks[index] = brick;
+        }
+
+        public BrickChunk(Vector3i position)
+        {
+            ChunkPosition = position;
         }
     }
 }

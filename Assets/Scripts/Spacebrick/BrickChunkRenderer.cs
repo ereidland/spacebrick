@@ -75,7 +75,7 @@ namespace Spacebrick
             }
         }
 
-        public void BuildMeshes(TreeBasedBrickChunk chunk)
+        public void BuildMeshes(BrickChunk chunk)
         {
             _builder.Begin();
             var buildInfo = new BrickBuildInfo[chunk.BrickCount];

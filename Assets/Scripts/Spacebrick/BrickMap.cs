@@ -31,12 +31,15 @@ namespace Spacebrick
     public class BrickMap
     {
         private KeyValueTree<Vector3i, BrickChunk> _chunks = new KeyValueTree<Vector3i, BrickChunk>();
+        private BrickChunk _lastChunk;
 
         public BrickChunk GetChunk(Vector3i position)
         {
-            BrickChunk chunk;
-            _chunks.TryGet(position, out chunk);
-            return chunk;
+            if (_lastChunk != null && _lastChunk.ChunkPosition == position)
+                return _lastChunk;
+                
+            _chunks.TryGet(position, out _lastChunk);
+            return _lastChunk;
         }
 
         public BrickChunk GetOrCreateChunk(Vector3i position)
@@ -44,53 +47,18 @@ namespace Spacebrick
             var chunk = GetChunk(position);
             if (chunk == null)
             {
-                chunk = new BrickChunk();
+                chunk = _lastChunk = new BrickChunk(position);
                 _chunks.Set(position, chunk);
+                return chunk;
             }
 
             return chunk;
         }
-
-        public Brick GetBrick(int x, int y, int z)
-        {
-            Vector3i chunkPosition = BrickChunk.GetChunkPosition(new Vector3i(x, y, z));
-            BrickChunk chunk = GetChunk(chunkPosition);
-
-            if (chunk != null)
-            {
-                BrickChunk.GetChunkLocalPosition(ref x, ref y, ref z);
-                VoxelIndex voxelIndex = chunk.GetVoxelIndex(x, y, z);
-                var indexMeta = voxelIndex.IndexMeta;
-
-                switch (indexMeta)
-                {
-                    case VoxelIndexMeta.Here:
-                        //Got it on the first pass!
-                        return chunk.GetBrickAtIndex(voxelIndex.Index);
-                    case VoxelIndexMeta.Left:
-                        chunkPosition.x--;
-                        break;
-                    case VoxelIndexMeta.Down:
-                        chunkPosition.y--;
-                        break;
-                    case VoxelIndexMeta.Back:
-                        chunkPosition.z--;
-                        break;
-                    case VoxelIndexMeta.LeftDownBack:
-                        chunkPosition.x--;
-                        chunkPosition.y--;
-                        chunkPosition.z--;
-                        break;
-                }
-
-                //We need to go to another chunk for our data.
-                chunk = GetChunk(chunkPosition);
-                if (chunk != null)
-                    return chunk.GetBrickAtIndex(voxelIndex.Index);
-            }
-
-            return new Brick();
-        }
+        //TODO: Code.
+//        public bool HasAnyOverlappingBricks(int x, int y, int z, int width, int height, int depth)
+//        {
+//
+//        }
     }
 }
 

@@ -51,24 +51,31 @@ namespace Spacebrick
                     Debug.Log("What is " + brickPrefab.name + " doing here without a BrickPrefabConfigComponent?");
             }
 
-            var chunk = new TreeBasedBrickChunk(new Vector3i());
+            var chunk = new BrickChunk(new Vector3i());
             var directions = System.Enum.GetValues(typeof(BrickDirection));
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 4000; i++)
             {
                 var type = knownTypes[Random.Range(0, knownTypes.Count)];
-                int width = Random.Range(1, 8);
-                int height = Random.Range(1, 8);
-                int depth = Random.Range(1, 8);
-                int x = Random.Range(0, TreeBasedBrickChunk.ChunkSize);
-                int y = Random.Range(0, TreeBasedBrickChunk.ChunkSize);
-                int z = Random.Range(0, TreeBasedBrickChunk.ChunkSize);
+                int width = Random.Range(1, 2);
+                int height = Random.Range(1, 2);
+                int depth = Random.Range(1, 2);
+                int x = Random.Range(0, BrickChunk.ChunkSize);
+                int y = Random.Range(0, BrickChunk.ChunkSize);
+                int z = Random.Range(0, BrickChunk.ChunkSize);
 
                 BrickDirection rotation = (BrickDirection)directions.GetValue(Random.Range(0, directions.Length - 1));
 
-                chunk.SetBrick(new Brick(new BitRect(x, y, z, width, height, depth), new BrickInfo(type.ID, rotation)));
+                chunk.AddBrick(new Brick(new BitRect(x, y, z, width, height, depth), new BrickInfo(type.ID, rotation)));
             }
 
             _chunkRenderer.BuildMeshes(chunk);
+        }
+
+
+        private void OnDrawGizmos()
+        {
+            Vector3 center = transform.TransformPoint(Vector3.one*BrickChunk.ChunkSize*0.5f);
+            Gizmos.DrawWireCube(center, Vector3.one*BrickChunk.ChunkSize);
         }
     }
 }

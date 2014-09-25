@@ -68,7 +68,7 @@ namespace Spacebrick
                 builder.AddVertex(centerPosition + Vector3.Scale(rotation*_vertices[i], blockScale), _normals[i], _uvs[i], _colors[i]);
 
             for (int i = 0; i < _indices.Length; i++)
-                builder.AddIndex((short)(_indices[i] + indexOffset));
+                builder.AddIndex(_indices[i] + indexOffset);
         }
 
         public void OverrideColor(Color color)

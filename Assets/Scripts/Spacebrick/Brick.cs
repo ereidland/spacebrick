@@ -74,6 +74,8 @@ namespace Spacebrick
             set { _data = (ushort)(ID | (value << MetaShift)); }
         }
 
+        public BrickTypeInfo TypeInfo { get { return BrickTypeInfo.GetTypeInfo(ID); } }
+
         public BrickInfo(ushort id, BrickDirection direction = BrickDirection.Forward)
         {
             _data = 0;
@@ -92,6 +94,8 @@ namespace Spacebrick
     {
         public BitRect Rect;
         public BrickInfo Info;
+
+        public BrickTypeInfo TypeInfo { get { return BrickTypeInfo.GetTypeInfo(Info.ID); } }
 
         public bool IsEmpty { get { return Info.ID == 0; } }
 

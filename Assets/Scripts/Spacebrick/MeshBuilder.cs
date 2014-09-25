@@ -56,7 +56,7 @@ namespace Spacebrick
                 mesh.SetIndices(Indices, MeshTopology.Triangles, 0);
             }
 
-            public void AddIndex(short index) { Indices[CurrentIndex++] = index; }
+            public void AddIndex(int index) { Indices[CurrentIndex++] = index; }
 
             public void AddVertex(Vector3 position, Vector3 normal, Vector2 uv, Color color)
             {
@@ -179,7 +179,7 @@ namespace Spacebrick
                 _currentChannel.GoToNextInfo();
         }
 
-        public void AddIndex(short index)
+        public void AddIndex(int index)
         {
             _currentInfo.AddIndex(index);
         }

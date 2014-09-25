@@ -31,6 +31,13 @@ namespace Spacebrick
     {
         public const int MaxValue = 16;
 
+        public static bool TestIntersection(int selfAX, int selfAY, int selfAZ, int selfBX, int selfBY, int selfBZ, int otherAX, int otherAY, int otherAZ, int otherBX, int otherBY, int otherBZ)
+        {
+            return Math.Abs(selfAX + selfBX - otherAX - otherBX) <= (selfBX - selfAX + otherBX - otherAX)
+                && Math.Abs(selfAY + selfBY - otherAY - otherBY) <= (selfBY - selfAY + otherBY - otherAY)
+                && Math.Abs(selfAZ + selfBZ - otherAZ - otherBZ) <= (selfBZ - selfAZ + otherBZ - otherAZ);
+        }
+
         public static byte GetFirstFour(byte b) { return (byte)(b >> 4); }
         public static byte GetSecondFour(byte b) { return (byte)(b & 0xF); }
 
@@ -92,6 +99,11 @@ namespace Spacebrick
             y -= Y;
             z -= Z;
             return x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Depth;
+        }
+
+        public bool Intersects(int x, int y, int z, int width, int height, int depth)
+        {
+            return TestIntersection(X, Y, Z, X + Width, Y + Height, Z + Depth, x, y, z, x + width, y + height, z + depth);
         }
 
         public bool Intersects(BitRect other)

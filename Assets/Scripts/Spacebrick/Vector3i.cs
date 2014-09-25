@@ -62,6 +62,9 @@ namespace Spacebrick
             return false;
         }
 
+        public static bool operator == (Vector3i self, Vector3i other) { return self.Equals(other); }
+        public static bool operator != (Vector3i self, Vector3i other) { return !self.Equals(other); }
+
         public Vector3i(int x = 0, int y = 0, int z = 0)
         {
             this.x = x;
