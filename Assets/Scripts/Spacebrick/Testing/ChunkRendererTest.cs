@@ -53,19 +53,20 @@ namespace Spacebrick
 
             var chunk = new BrickChunk(new Vector3i());
             var directions = System.Enum.GetValues(typeof(BrickDirection));
-            for (int i = 0; i < 4000; i++)
+            for (int i = 0; i < 5000; i++)
             {
                 var type = knownTypes[Random.Range(0, knownTypes.Count)];
-                int width = Random.Range(1, 2);
-                int height = Random.Range(1, 2);
-                int depth = Random.Range(1, 2);
+                int width = Random.Range(1, 8);
+                int height = Random.Range(1, 8);
+                int depth = Random.Range(1, 8);
                 int x = Random.Range(0, BrickChunk.ChunkSize);
                 int y = Random.Range(0, BrickChunk.ChunkSize);
                 int z = Random.Range(0, BrickChunk.ChunkSize);
 
                 BrickDirection rotation = (BrickDirection)directions.GetValue(Random.Range(0, directions.Length - 1));
 
-                chunk.AddBrick(new Brick(new BitRect(x, y, z, width, height, depth), new BrickInfo(type.ID, rotation)));
+                if (!chunk.HasAnyOverlappingBricks(x, y, z, width, height, depth))
+                    chunk.AddBrick(new Brick(new BitRect(x, y, z, width, height, depth), new BrickInfo(type.ID, rotation)));
             }
 
             _chunkRenderer.BuildMeshes(chunk);
