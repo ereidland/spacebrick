@@ -101,7 +101,6 @@ namespace Spacebrick
 
         public bool HasAnyOverlappingBricks(BitRect rect)
         {
-            List<Brick> overlappingBricks = new List<Brick>();
             for(int i = 0; i < _bricks.Count; i++)
                 if (_bricks[i].Rect.Intersects(rect))
                     return true;
