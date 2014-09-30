@@ -28,10 +28,23 @@ using System.Collections.Generic;
 
 namespace Spacebrick
 {
+    public class ChunkCreatedEvent
+    {
+        public BrickChunk NewChunk { get; private set; }
+        public ChunkCreatedEvent(BrickChunk newChunk)
+        {
+            NewChunk = newChunk;
+        }
+    }
+
     public class BrickMap
     {
         private KeyValueTree<Vector3i, BrickChunk> _chunks = new KeyValueTree<Vector3i, BrickChunk>();
         private BrickChunk _lastChunk;
+
+        public EventHub Events { get; private set; }
+
+        private EventCallbackList _chunkCreatedList;
 
         public BrickChunk GetChunk(Vector3i position)
         {
@@ -47,18 +60,21 @@ namespace Spacebrick
             var chunk = GetChunk(position);
             if (chunk == null)
             {
-                chunk = _lastChunk = new BrickChunk(position);
+                chunk = _lastChunk = new BrickChunk(this, position);
                 _chunks.Set(position, chunk);
+
+                _chunkCreatedList.Execute(new ChunkCreatedEvent(chunk));
                 return chunk;
             }
 
             return chunk;
         }
-        //TODO: Code.
-//        public bool HasAnyOverlappingBricks(int x, int y, int z, int width, int height, int depth)
-//        {
-//
-//        }
+
+        public BrickMap(EventHub events)
+        {
+            Events = events;
+            _chunkCreatedList = Events.GetList(typeof(ChunkCreatedEvent));
+        }
     }
 }
 

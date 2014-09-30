@@ -28,6 +28,26 @@ using System.Collections.Generic;
 
 namespace Spacebrick
 {
+    public enum BrickModification
+    {
+        Created,
+        Removed,
+    }
+
+    public class BrickModifiedEvent
+    {
+        public BrickChunk Chunk { get; private set; }
+        public Brick ModifiedBrick { get; private set; }
+        public BrickModification Modification { get; private set; }
+
+        public BrickModifiedEvent(BrickChunk chunk, Brick brick, BrickModification modification)
+        {
+            Chunk = chunk;
+            ModifiedBrick = brick;
+            Modification = modification;
+        }
+    }
+
     public class BrickChunk
     {
         public const int ChunkSize = 16;
@@ -58,6 +78,19 @@ namespace Spacebrick
 
         public Vector3i ChunkPosition { get; private set; }
         public Vector3i WorldPosition { get { return GetWorldPosition(ChunkPosition); } }
+        public BrickMap Map { get; private set; }
+
+        private EventCallbackList _brickModifiedList;
+
+        private void NotifyBrickCreated(Brick brick)
+        {
+            _brickModifiedList.Execute(new BrickModifiedEvent(this, brick, BrickModification.Created));
+        }
+
+        private void NotifyBrickRemoved(Brick brick)
+        {
+            _brickModifiedList.Execute(new BrickModifiedEvent(this, brick, BrickModification.Removed));
+        }
 
         private bool ContainsLocally(int x, int y, int z)
         {
@@ -125,6 +158,19 @@ namespace Spacebrick
         public void AddBrick(Brick brick)
         {
             _bricks.Add(brick);
+            NotifyBrickCreated(brick);
+        }
+
+        public void RemoveBrickAtIndex(int index)
+        {
+            if (index >= 0 && index < _bricks.Count)
+            {
+                var existingBrick = _bricks[index];
+                _bricks.RemoveAt(index);
+
+                if (!existingBrick.IsEmpty)
+                    NotifyBrickRemoved(existingBrick);
+            }
         }
 
         public Brick GetBrickAtIndex(int index)
@@ -138,12 +184,23 @@ namespace Spacebrick
         public void SetBrickAtIndex(int index, Brick brick)
         {
             if (index >= 0 && index < _bricks.Count)
+            {
+                var existingBrick = _bricks[index];
                 _bricks[index] = brick;
+
+                if (!existingBrick.IsEmpty)
+                    NotifyBrickRemoved(existingBrick);
+
+                NotifyBrickCreated(brick);
+            }
         }
 
-        public BrickChunk(Vector3i position)
+        public BrickChunk(BrickMap map, Vector3i position)
         {
+            Map = map;
             ChunkPosition = position;
+
+            _brickModifiedList = map.Events.GetList(typeof(BrickModifiedEvent));
         }
     }
 }

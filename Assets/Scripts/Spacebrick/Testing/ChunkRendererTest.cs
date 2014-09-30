@@ -28,6 +28,7 @@ using UnityEngine;
 
 namespace Spacebrick
 {
+    //Test is no longer valid. Needs to be re-written with a full MapRenderer.
     public class ChunkRendererTest : MonoBehaviour
     {
         private BrickChunkRenderer _chunkRenderer;
@@ -51,7 +52,7 @@ namespace Spacebrick
                     Debug.Log("What is " + brickPrefab.name + " doing here without a BrickPrefabConfigComponent?");
             }
 
-            var chunk = new BrickChunk(new Vector3i());
+            var chunk = new BrickChunk(null, new Vector3i());
             var directions = System.Enum.GetValues(typeof(BrickDirection));
             for (int i = 0; i < 5000; i++)
             {
