@@ -31,14 +31,14 @@ namespace Spacebrick
     //Test is no longer valid. Needs to be re-written with a full MapRenderer.
     public class ChunkRendererTest : MonoBehaviour
     {
-        private BrickChunkRenderer _chunkRenderer;
+        private BrickMapRenderer _mapRenderer;
         private void Start()
         {
             List<BrickTypeInfo> knownTypes = new List<BrickTypeInfo>();
 
-            //Not intended use case. Trying to just figure out if everything works.
-            _chunkRenderer = gameObject.AddComponent<BrickChunkRenderer>();
+            _mapRenderer = gameObject.AddComponent<BrickMapRenderer>();
 
+            //TODO: Proper way for loading config.
             var brickPrefabs = Resources.LoadAll<GameObject>("Spacebricks");
             foreach (var brickPrefab in brickPrefabs)
             {
@@ -49,28 +49,29 @@ namespace Spacebrick
                     knownTypes.Add(brickPrefabConfig.TypeInfo);
                 }
                 else
-                    Debug.Log("What is " + brickPrefab.name + " doing here without a BrickPrefabConfigComponent?");
+                    Debug.Log("What is " + brickPrefab.name + " doing here without a BrickPrefabConfig Component?");
             }
 
-            var chunk = new BrickChunk(null, new Vector3i());
+            var map = new BrickMap(new EventHub());
+            _mapRenderer.AssignMap(map);
+
+            const int randomRange = 100;
+
             var directions = System.Enum.GetValues(typeof(BrickDirection));
             for (int i = 0; i < 5000; i++)
             {
                 var type = knownTypes[Random.Range(0, knownTypes.Count)];
-                int width = Random.Range(1, 8);
-                int height = Random.Range(1, 8);
-                int depth = Random.Range(1, 8);
-                int x = Random.Range(0, BrickChunk.ChunkSize);
-                int y = Random.Range(0, BrickChunk.ChunkSize);
-                int z = Random.Range(0, BrickChunk.ChunkSize);
+                int width = Random.Range(1, 15);
+                int height = Random.Range(1, 15);
+                int depth = Random.Range(1, 15);
+                Vector3i worldPosition = new Vector3i(Random.Range(-randomRange, randomRange), Random.Range(-randomRange, randomRange), Random.Range(-randomRange, randomRange));
+                Vector3i localPosition = BrickChunk.GetChunkLocalPosition(worldPosition);
 
                 BrickDirection rotation = (BrickDirection)directions.GetValue(Random.Range(0, directions.Length - 1));
 
-                if (!chunk.HasAnyOverlappingBricks(x, y, z, width, height, depth))
-                    chunk.AddBrick(new Brick(new BitRect(x, y, z, width, height, depth), new BrickInfo(type.ID, rotation)));
+                if (!map.HasAnyOverlappingBricks(worldPosition, new BitRect(0, 0, 0, width, height, depth)))
+                    map.AddBrick(worldPosition, new Brick(new BitRect(localPosition.x, localPosition.y, localPosition.z, width, height, depth), new BrickInfo(type.ID, rotation)));
             }
-
-            _chunkRenderer.BuildMeshes(chunk);
         }
 
 

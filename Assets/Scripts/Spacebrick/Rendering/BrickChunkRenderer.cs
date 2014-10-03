@@ -34,6 +34,8 @@ namespace Spacebrick
         private MeshBuilder _builder = new MeshBuilder();
         private List<MeshFilter> _meshFilters = new List<MeshFilter>();
 
+        public bool BakeColliders = false;
+
         private class BrickBuildInfo
         {
             public Brick Brick;
@@ -45,6 +47,9 @@ namespace Spacebrick
                 VisualInfo = visualInfo;
             }
         }
+
+
+        public BrickChunk AssignedChunk { get; set; }
 
         private void AllocateMeshes(int howMany)
         {
@@ -120,7 +125,25 @@ namespace Spacebrick
 
                 meshFilter.sharedMesh = generatedMeshInfo.GeneratedMesh;
                 meshFilter.renderer.sharedMaterial = generatedMeshInfo.RenderMaterial;
+
+                if (BakeColliders)
+                {
+                    var meshCollider = meshFilter.GetComponent<MeshCollider>();
+                    if (meshCollider == null)
+                        meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
+                    else
+                    {
+                        meshCollider.sharedMesh = null;
+                        meshCollider.sharedMesh = generatedMeshInfo.GeneratedMesh;
+                    }
+                }
             }
+        }
+
+        public void BuildMeshes()
+        {
+            if (AssignedChunk != null)
+                BuildMeshes(AssignedChunk);
         }
     }
 }

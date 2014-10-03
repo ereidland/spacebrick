@@ -97,6 +97,44 @@ namespace Spacebrick
             return x >= 0 && y >= 0 && z >= 0 && x < ChunkSize && y < ChunkSize && z < ChunkSize;
         }
 
+        public BitRect LocalizeRect(Vector3i otherChunkPosition, BitRect rect)
+        {
+            Vector3i chunkWorldPosition = WorldPosition;
+            Vector3i otherChunkWorldPosition = GetWorldPosition(otherChunkPosition);
+            Vector3i offset = otherChunkWorldPosition - chunkWorldPosition;
+
+            int x = rect.X;
+            int y = rect.Y;
+            int z = rect.Z;
+            int width = rect.Width;
+            int height = rect.Height;
+            int depth = rect.Depth;
+
+            x += offset.x;
+            y += offset.y; 
+            z += offset.z;
+
+            if (x < 0)
+                width += x;
+
+            if (y < 0)
+                height += y;
+
+            if (z < 0)
+                depth += z;
+
+            if (width > 0 && height > 0 && depth > 0)
+            {
+                x = Math.Max(x, 0);
+                y = Math.Max(y, 0);
+                z = Math.Max(z, 0);
+
+                return new BitRect(x, y, z, width, height, depth);
+            }
+
+            return new BitRect();
+        }
+
         private List<Brick> _bricks = new List<Brick>();
 
         public IEnumerable<Brick> Bricks
@@ -110,17 +148,33 @@ namespace Spacebrick
 
         public int BrickCount { get { return _bricks.Count; } }
 
-        public List<Brick> GetOverlappingBricks(BitRect rect)
+        public void GetOverlappingBricks(List<Brick> overlappingBricks, BitRect rect)
         {
-            List<Brick> overlappingBricks = new List<Brick>();
             for(int i = 0; i < _bricks.Count; i++)
             {
                 var brick = _bricks[i];
                 if (brick.Rect.Intersects(rect))
                     overlappingBricks.Add(brick);
             }
+        }
 
+        public List<Brick> GetOverlappingBricks(BitRect rect)
+        {
+            List<Brick> overlappingBricks = new List<Brick>();
+            GetOverlappingBricks(overlappingBricks, rect);
             return overlappingBricks;
+        }
+
+        public Brick GetBrick(int x, int y, int z)
+        {
+            for (int i = 0; i < _bricks.Count; i++)
+            {
+                var brick = _bricks[i];
+                if (brick.Rect.Contains(x, y, z))
+                    return brick;
+            }
+
+            return new Brick();
         }
 
         public bool HasAnyOverlappingBricks(int x, int y, int z, int width, int height, int depth)

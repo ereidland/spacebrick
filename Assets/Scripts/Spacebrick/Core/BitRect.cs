@@ -55,6 +55,11 @@ namespace Spacebrick
 
         private byte _a, _b, _c;
 
+        public bool IsEmpty
+        {
+            get { return Width == 0 || Height == 0 || Depth == 0; }
+        }
+
         public int PositionIndex { get { return Z * MaxValue * MaxValue + Y * MaxValue + X; } }
 
         public byte X
