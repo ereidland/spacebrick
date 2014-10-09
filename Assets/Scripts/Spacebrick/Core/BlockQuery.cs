@@ -1,5 +1,5 @@
 ﻿//
-// BrickPrefabConfig.cs
+// Block.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -23,48 +23,31 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using UnityEngine;
-using System.Collections;
+using System;
 
 namespace Spacebrick
 {
-    public class BrickPrefabConfig : MonoBehaviour
+    public class BlockQuery
     {
-        public enum MeshSettings
+        public VoxelChunk Chunk { get; private set; }
+        public VoxelMap Map { get { return Chunk.Map; } }
+
+
+        //Slightly faster read/write when not going through properties.
+        public Voxel Voxel;
+        public Vector3i WorldPosition;
+        public Vector3i LocalPosition;
+
+        public void Set(Voxel voxel, VoxelChunk chunk, int worldX, int worldY, int worldZ)
         {
-            LeaveItAlone,
-            OverrideColor,
-        }
+            Voxel = voxel;
+            Chunk = chunk;
 
-        [SerializeField]
-        private string _name;
+            WorldPosition.Set(worldX, worldY, worldZ);
+            LocalPosition.Set(WorldPosition);
 
-        [SerializeField]
-        private Mesh _mesh;
-
-        [SerializeField]
-        private MeshSettings _meshSettings = MeshSettings.LeaveItAlone;
-
-        [SerializeField]
-        private Material _material;
-
-        [SerializeField]
-        private Color _color = Color.white;
-
-        public BlockTypeInfo TypeInfo { get; private set; }
-
-        public void Register()
-        {
-            TypeInfo = BlockTypeInfo.GetTypeInfo(name);
-            if (TypeInfo == null)
-                TypeInfo = new BlockTypeInfo(_name);
-
-            var builder = new BrickUnityMeshBuilder(_mesh, _material);
-
-            if (_meshSettings == MeshSettings.OverrideColor)
-                builder.OverrideColor(_color);
-
-            BlockVisualInfo.RegisterBuilder(TypeInfo, builder);
+            VoxelChunk.ConvertWorldToLocal(ref LocalPosition);
         }
     }
 }
+

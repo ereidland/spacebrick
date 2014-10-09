@@ -39,9 +39,9 @@ namespace Spacebrick
         private class BrickBuildInfo
         {
             public Brick Brick;
-            public BrickVisualInfo VisualInfo;
+            public BlockVisualInfo VisualInfo;
 
-            public BrickBuildInfo(Brick brick, BrickVisualInfo visualInfo)
+            public BrickBuildInfo(Brick brick, BlockVisualInfo visualInfo)
             {
                 Brick = brick;
                 VisualInfo = visualInfo;
@@ -88,7 +88,7 @@ namespace Spacebrick
 
             foreach (var brick in chunk.Bricks)
             {
-                var visual = BrickVisualInfo.GetVisualInfo(brick.Info.ID);
+                var visual = BlockVisualInfo.GetVisualInfo(brick.Info.ID);
                 if (visual != null)
                 {
                     if (visual.Builder != null)
@@ -107,7 +107,7 @@ namespace Spacebrick
 
             foreach (var brick in chunk.Bricks)
             {
-                var visual = BrickVisualInfo.GetVisualInfo(brick.Info.ID);
+                var visual = BlockVisualInfo.GetVisualInfo(brick.Info.ID);
                 if (visual != null && visual.Builder != null)
                     visual.Builder.Build(_builder, brick);
             }

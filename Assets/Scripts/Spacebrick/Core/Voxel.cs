@@ -1,5 +1,5 @@
 ﻿//
-// Brick.cs
+// Voxel.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -27,25 +27,18 @@ using System;
 
 namespace Spacebrick
 {
-    public enum BrickDirection : byte
-    {
-        Forward = 0,
-        Right = 1,
-        Back = 2,
-        Left = 3,
-        Up = 4,
-        Down = 5
-    }
-
-    public struct BrickInfo
+    public struct Voxel
     {
         public const ushort IDMask = 0x3FF; //0000 0011 1111 1111
 
-        public const ushort DirectionMask = 0x1C00; //0001 1100 0000 0000
-        public const ushort DirectionShift = 10;
+        public const ushort DirectionMask = 0x7000; //0111 0000 0000 0000
+        public const ushort DirectionShift = 12;
 
-        public const ushort MetaMask = 0xFC00; //1111 1100 0000 0000
+        public const ushort MetaMask = 0x7C00; //0111 1100 0000 0000
         public const ushort MetaShift = 10;
+
+        public const ushort PointerBoolMask = 0x8000; //1000 0000 0000 0000;
+        public const short PointerMask = 0xFFF; //0000 1111 1111 1111
 
         //Might cram in meta value into _data later.
         private ushort _data;
@@ -53,11 +46,11 @@ namespace Spacebrick
         public ushort ID
         {
             get { return (ushort)(_data & IDMask); }
-            set { _data = (ushort)((_data & MetaMask) | (value & IDMask)); }
+            set { _data = (ushort)((_data & ~IDMask) | (value & IDMask)); }
         }
 
         /// <summary>
-        /// Uses last 3 bits, but not first 3 bits, to store direction.
+        /// Uses bits 1 through 3 to store direction (3 bits)
         /// </summary>
         public BrickDirection Direction
         {
@@ -66,17 +59,36 @@ namespace Spacebrick
         }
 
         /// <summary>
-        /// Full 6 bit meta.
+        /// Bits from range 1 through 6 (5 bits)
         /// </summary>
         public byte Meta
         {
             get { return (byte)((_data & MetaMask) >> MetaShift); }
-            set { _data = (ushort)(ID | (value << MetaShift)); }
+            set { _data = (ushort)((_data & ~MetaMask) | (value << MetaShift)); }
         }
+
+        public ushort Pointer
+        {
+            get { return (ushort)(_data & PointerMask); }
+            set { _data = (ushort)((_data & ~PointerMask) | (value & PointerMask)); }
+        }
+
+        public bool IsPointer
+        {
+            get { return (_data & PointerBoolMask) != 0; }
+            set
+            {
+                _data = (ushort)(_data & ~PointerBoolMask);
+                if (value)
+                    _data |= PointerBoolMask;
+            }
+        }
+
+        public bool IsEmpty { get { return ID == 0; } }
 
         public BlockTypeInfo TypeInfo { get { return BlockTypeInfo.GetTypeInfo(ID); } }
 
-        public BrickInfo(ushort id, BrickDirection direction = BrickDirection.Forward)
+        public Voxel(ushort id, BrickDirection direction = BrickDirection.Forward)
         {
             _data = 0;
 
@@ -84,25 +96,9 @@ namespace Spacebrick
             Direction = direction;
         }
 
-        public BrickInfo(BrickInfo other)
+        public Voxel(Voxel other)
         {
             _data = other._data;
-        }
-    }
-
-    public struct Brick
-    {
-        public BitRect Rect;
-        public BrickInfo Info;
-
-        public BlockTypeInfo TypeInfo { get { return BlockTypeInfo.GetTypeInfo(Info.ID); } }
-
-        public bool IsEmpty { get { return Info.ID == 0; } }
-
-        public Brick(BitRect rect, BrickInfo info)
-        {
-            Rect = rect;
-            Info = info;
         }
     }
 }

@@ -74,15 +74,15 @@ namespace Spacebrick
         }
     }
 
-    public class BrickTypeInfo
+    public class BlockTypeInfo
     {
-        private static NameIDRegistry<BrickTypeInfo> _brickTypeRegistry = new NameIDRegistry<BrickTypeInfo>();
+        private static NameIDRegistry<BlockTypeInfo> _brickTypeRegistry = new NameIDRegistry<BlockTypeInfo>();
         private static NameIDManager _nameIDManager = new NameIDManager();
 
-        public static BrickTypeInfo GetTypeInfo(string name) { return _brickTypeRegistry.GetItem(name); }
-        public static BrickTypeInfo GetTypeInfo(int id) { return _brickTypeRegistry.GetItem(id); }
+        public static BlockTypeInfo GetTypeInfo(string name) { return _brickTypeRegistry.GetItem(name); }
+        public static BlockTypeInfo GetTypeInfo(int id) { return _brickTypeRegistry.GetItem(id); }
 
-        private static void Register(BrickTypeInfo info)
+        private static void Register(BlockTypeInfo info)
         {
             _brickTypeRegistry.RegisterItem(info, info.Name, info.ID);
         }
@@ -92,7 +92,7 @@ namespace Spacebrick
 
         //TODO: Initialization from JSON, where ID is managed through a separate list.
 
-        public BrickTypeInfo(string name)
+        public BlockTypeInfo(string name)
         {
             Name = name;
             if (!string.IsNullOrEmpty(name))

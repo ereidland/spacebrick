@@ -34,7 +34,7 @@ namespace Spacebrick
         private BrickMapRenderer _mapRenderer;
         private void Start()
         {
-            List<BrickTypeInfo> knownTypes = new List<BrickTypeInfo>();
+            List<BlockTypeInfo> knownTypes = new List<BlockTypeInfo>();
 
             _mapRenderer = gameObject.AddComponent<BrickMapRenderer>();
 

@@ -59,26 +59,26 @@ namespace Spacebrick
             }
         }
     }
-    public class BrickVisualInfo
+    public class BlockVisualInfo
     {
-        private static NameIDRegistry<BrickVisualInfo> _brickVisualRegistry = new NameIDRegistry<BrickVisualInfo>();
+        private static NameIDRegistry<BlockVisualInfo> _brickVisualRegistry = new NameIDRegistry<BlockVisualInfo>();
 
-        public BrickTypeInfo BrickType { get; private set; }
+        public BlockTypeInfo BrickType { get; private set; }
         public IBrickMeshBuilder Builder { get; private set; }
 
-        public static BrickVisualInfo GetVisualInfo(string name) { return _brickVisualRegistry.GetItem(name); }
-        public static BrickVisualInfo GetVisualInfo(int id) { return _brickVisualRegistry.GetItem(id); }
+        public static BlockVisualInfo GetVisualInfo(string name) { return _brickVisualRegistry.GetItem(name); }
+        public static BlockVisualInfo GetVisualInfo(int id) { return _brickVisualRegistry.GetItem(id); }
 
-        public static bool RegisterBuilder(string name, IBrickMeshBuilder builder) { return RegisterBuilder(BrickTypeInfo.GetTypeInfo(name), builder); }
-        public static bool RegisterBuilder(int id, IBrickMeshBuilder builder) { return RegisterBuilder(BrickTypeInfo.GetTypeInfo(id), builder); }
+        public static bool RegisterBuilder(string name, IBrickMeshBuilder builder) { return RegisterBuilder(BlockTypeInfo.GetTypeInfo(name), builder); }
+        public static bool RegisterBuilder(int id, IBrickMeshBuilder builder) { return RegisterBuilder(BlockTypeInfo.GetTypeInfo(id), builder); }
 
-        public static bool RegisterBuilder(BrickTypeInfo typeInfo, IBrickMeshBuilder builder)
+        public static bool RegisterBuilder(BlockTypeInfo typeInfo, IBrickMeshBuilder builder)
         {
             if (typeInfo != null && builder != null)
             {
                 var visualInfo = _brickVisualRegistry.GetItem(typeInfo.ID);
                 if (visualInfo == null)
-                    visualInfo = new BrickVisualInfo(typeInfo);
+                    visualInfo = new BlockVisualInfo(typeInfo);
 
                 visualInfo.Builder = builder;
                 return true;
@@ -87,7 +87,7 @@ namespace Spacebrick
         }
 
         //TODO: Useful parameters once we need them.
-        public BrickVisualInfo(BrickTypeInfo typeInfo)
+        public BlockVisualInfo(BlockTypeInfo typeInfo)
         {
             BrickType = typeInfo;
 
