@@ -54,6 +54,21 @@ namespace Spacebrick
         private Vector2[] _uvs;
         private Color[] _colors;
 
+        public void Build(MeshBuilder builder, BlockDirection direction, int x, int y, int z)
+        {
+            Vector3 centerPosition = new Vector3(x + 0.5f, y + 0.5f, z + 0.5f);
+
+            builder.PrepIndices(RenderMaterial, _indices.Length);
+            int indexOffset = builder.CurrentVertex;
+            Quaternion rotation = direction.ToRotation();
+
+            for (int i = 0; i < _vertices.Length; i++)
+                builder.AddVertex(centerPosition + rotation*_vertices[i], rotation*_normals[i], _uvs[i], _colors[i]);
+
+            for (int i = 0; i < _indices.Length; i++)
+                builder.AddIndex(_indices[i] + indexOffset);
+        }
+
         public void Build(MeshBuilder builder, Brick brick)
         {
             Vector3 rootPosition = new Vector3(brick.Rect.X, brick.Rect.Y, brick.Rect.Z);

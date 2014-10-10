@@ -1,5 +1,5 @@
 ﻿//
-// ChunkRendererTest.cs
+// VoxelMapRendererTest.cs
 //
 // Author:
 //       Evan Reidland <er@evanreidland.com>
@@ -29,14 +29,14 @@ using UnityEngine;
 namespace Spacebrick
 {
     //Test is no longer valid. Needs to be re-written with a full MapRenderer.
-    public class ChunkRendererTest : MonoBehaviour
+    public class VoxelMapRendererTest : MonoBehaviour
     {
-        private BrickMapRenderer _mapRenderer;
+        private VoxelMapRenderer _mapRenderer;
         private void Start()
         {
             List<BlockTypeInfo> knownTypes = new List<BlockTypeInfo>();
 
-            _mapRenderer = gameObject.AddComponent<BrickMapRenderer>();
+            _mapRenderer = gameObject.AddComponent<VoxelMapRenderer>();
 
             //TODO: Proper way for loading config.
             var brickPrefabs = Resources.LoadAll<GameObject>("Spacebricks");
@@ -52,25 +52,18 @@ namespace Spacebrick
                     Debug.Log("What is " + brickPrefab.name + " doing here without a BrickPrefabConfig Component?");
             }
 
-            var map = new BrickMap(new EventHub());
+            var map = new VoxelMap(new EventHub());
             _mapRenderer.AssignMap(map);
 
             const int randomRange = 100;
 
             var directions = System.Enum.GetValues(typeof(BlockDirection));
-            for (int i = 0; i < 5000; i++)
+            for (int i = 0; i < 50000; i++)
             {
                 var type = knownTypes[Random.Range(0, knownTypes.Count)];
-                int width = Random.Range(1, 15);
-                int height = Random.Range(1, 15);
-                int depth = Random.Range(1, 15);
                 Vector3i worldPosition = new Vector3i(Random.Range(-randomRange, randomRange), Random.Range(-randomRange, randomRange), Random.Range(-randomRange, randomRange));
-                Vector3i localPosition = BrickChunk.GetChunkLocalPosition(worldPosition);
-
                 BlockDirection rotation = (BlockDirection)directions.GetValue(Random.Range(0, directions.Length - 1));
-
-                if (!map.HasAnyOverlappingBricks(worldPosition, new BitRect(0, 0, 0, width, height, depth)))
-                    map.AddBrick(worldPosition, new Brick(new BitRect(localPosition.x, localPosition.y, localPosition.z, width, height, depth), new BrickInfo(type.ID, rotation)));
+                map.SetVoxel(worldPosition.x, worldPosition.y, worldPosition.z, new Voxel(type.ID, rotation));
             }
         }
 

@@ -27,7 +27,7 @@ using System;
 
 namespace Spacebrick
 {
-    public enum BrickDirection : byte
+    public enum BlockDirection : byte
     {
         Forward = 0,
         Right = 1,
@@ -59,9 +59,9 @@ namespace Spacebrick
         /// <summary>
         /// Uses last 3 bits, but not first 3 bits, to store direction.
         /// </summary>
-        public BrickDirection Direction
+        public BlockDirection Direction
         {
-            get { return (BrickDirection)((_data & DirectionMask) >> DirectionShift); }
+            get { return (BlockDirection)((_data & DirectionMask) >> DirectionShift); }
             set { _data = (ushort)((_data & ~DirectionMask) | ((byte)value << DirectionShift)); }
         }
 
@@ -76,7 +76,7 @@ namespace Spacebrick
 
         public BlockTypeInfo TypeInfo { get { return BlockTypeInfo.GetTypeInfo(ID); } }
 
-        public BrickInfo(ushort id, BrickDirection direction = BrickDirection.Forward)
+        public BrickInfo(ushort id, BlockDirection direction = BlockDirection.Forward)
         {
             _data = 0;
 

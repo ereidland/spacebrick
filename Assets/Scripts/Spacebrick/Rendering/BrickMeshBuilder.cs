@@ -35,6 +35,9 @@ namespace Spacebrick
         int TotalIndices { get; }
         Material RenderMaterial { get; }
 
+        void Build(MeshBuilder builder, BlockDirection direction, int x, int y, int z);
+
+        //Remove this once "bricks" are removed from project.
         void Build(MeshBuilder builder, Brick brick);
     }
 }

@@ -52,9 +52,9 @@ namespace Spacebrick
         /// <summary>
         /// Uses bits 1 through 3 to store direction (3 bits)
         /// </summary>
-        public BrickDirection Direction
+        public BlockDirection Direction
         {
-            get { return (BrickDirection)((_data & DirectionMask) >> DirectionShift); }
+            get { return (BlockDirection)((_data & DirectionMask) >> DirectionShift); }
             set { _data = (ushort)((_data & ~DirectionMask) | ((byte)value << DirectionShift)); }
         }
 
@@ -86,9 +86,11 @@ namespace Spacebrick
 
         public bool IsEmpty { get { return ID == 0; } }
 
+        public bool IsCore { get { return !IsEmpty && !IsPointer; } }
+
         public BlockTypeInfo TypeInfo { get { return BlockTypeInfo.GetTypeInfo(ID); } }
 
-        public Voxel(ushort id, BrickDirection direction = BrickDirection.Forward)
+        public Voxel(ushort id, BlockDirection direction = BlockDirection.Forward)
         {
             _data = 0;
 

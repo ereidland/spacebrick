@@ -39,21 +39,21 @@ namespace Spacebrick
         private static Quaternion Down = Quaternion.AngleAxis(90, Vector3.right);
         private static Quaternion Up = Quaternion.AngleAxis(-90, Vector3.right);
 
-        public static Quaternion ToRotation(this BrickDirection direciton)
+        public static Quaternion ToRotation(this BlockDirection direciton)
         {
             switch (direciton)
             {
-                case BrickDirection.Right:
+                case BlockDirection.Right:
                     return Right;
-                case BrickDirection.Back:
+                case BlockDirection.Back:
                     return Back;
-                case BrickDirection.Left:
+                case BlockDirection.Left:
                     return Left;
-                case BrickDirection.Down:
+                case BlockDirection.Down:
                     return Down;
-                case BrickDirection.Up:
+                case BlockDirection.Up:
                     return Up;
-                case BrickDirection.Forward:
+                case BlockDirection.Forward:
                 default:
                     return Forward;
             }

@@ -76,23 +76,22 @@ namespace Spacebrick
 
     public class BlockTypeInfo
     {
-        private static NameIDRegistry<BlockTypeInfo> _brickTypeRegistry = new NameIDRegistry<BlockTypeInfo>();
+        private static NameIDRegistry<BlockTypeInfo> _blockTypeRegistry = new NameIDRegistry<BlockTypeInfo>();
         private static NameIDManager _nameIDManager = new NameIDManager();
 
-        public static BlockTypeInfo GetTypeInfo(string name) { return _brickTypeRegistry.GetItem(name); }
-        public static BlockTypeInfo GetTypeInfo(int id) { return _brickTypeRegistry.GetItem(id); }
+        public static BlockTypeInfo GetTypeInfo(string name) { return _blockTypeRegistry.GetItem(name); }
+        public static BlockTypeInfo GetTypeInfo(int id) { return _blockTypeRegistry.GetItem(id); }
 
         private static void Register(BlockTypeInfo info)
         {
-            _brickTypeRegistry.RegisterItem(info, info.Name, info.ID);
+            _blockTypeRegistry.RegisterItem(info, info.Name, info.ID);
         }
 
         public string Name { get; private set; }
         public ushort ID { get; private set; }
+        public bool HasDirection { get; private set; }
 
-        //TODO: Initialization from JSON, where ID is managed through a separate list.
-
-        public BlockTypeInfo(string name)
+        public BlockTypeInfo(string name, bool hasDirection)
         {
             Name = name;
             if (!string.IsNullOrEmpty(name))

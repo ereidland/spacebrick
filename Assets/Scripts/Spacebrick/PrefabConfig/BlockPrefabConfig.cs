@@ -28,7 +28,7 @@ using System.Collections;
 
 namespace Spacebrick
 {
-    public class BrickPrefabConfig : MonoBehaviour
+    public class BlockPrefabConfig : MonoBehaviour
     {
         public enum MeshSettings
         {
@@ -51,13 +51,16 @@ namespace Spacebrick
         [SerializeField]
         private Color _color = Color.white;
 
+        [SerializeField]
+        private bool _hasDirection = true;
+
         public BlockTypeInfo TypeInfo { get; private set; }
 
         public void Register()
         {
             TypeInfo = BlockTypeInfo.GetTypeInfo(name);
             if (TypeInfo == null)
-                TypeInfo = new BlockTypeInfo(_name);
+                TypeInfo = new BlockTypeInfo(_name, _hasDirection);
 
             var builder = new BrickUnityMeshBuilder(_mesh, _material);
 
